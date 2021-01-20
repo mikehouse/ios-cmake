@@ -64,6 +64,7 @@
 #    WATCHOS = Build for armv7k arm64_32 for watchOS.
 #    WATCHOSCOMBINED = Build for armv7k arm64_32 x86_64 watchOS. Combined into FAT STATIC lib (supported on 3.14+ of CMake with "-G Xcode" argument ONLY)
 #    SIMULATOR_WATCHOS = Build for x86_64 for watchOS Simulator.
+#    MAC_CATALYST = Build for macOS Catalyst
 #
 # CMAKE_OSX_SYSROOT: Path to the SDK to use.  By default this is
 #    automatically determined from PLATFORM and xcodebuild, but
@@ -94,6 +95,7 @@
 #    SIMULATOR_TVOS = x86_64 (i386 has since long been deprecated)
 #    WATCHOS = armv7k arm64_32 (if applicable)
 #    SIMULATOR_WATCHOS = x86_64 (i386 has since long been deprecated)
+#    MAC_CATALYST = x86_64
 #
 # This toolchain defines the following variables for use externally:
 #
@@ -327,6 +329,11 @@ elseif(PLATFORM_INT STREQUAL "SIMULATOR_WATCHOS")
   if(NOT ARCHS)
     set(ARCHS i386)
     set(APPLE_TARGET_TRIPLE_INT i386-apple-watchos)
+  endif()
+elseif(PLATFORM_INT STREQUAL "MAC_CATALYST")
+  set(SDK_NAME macosx)
+  if(NOT ARCHS)
+    set(ARCHS x86_64)
   endif()
 else()
   message(FATAL_ERROR "Invalid PLATFORM: ${PLATFORM_INT}")
