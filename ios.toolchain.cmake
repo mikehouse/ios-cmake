@@ -65,6 +65,7 @@
 #    WATCHOSCOMBINED = Build for armv7k arm64_32 x86_64 watchOS. Combined into FAT STATIC lib (supported on 3.14+ of CMake with "-G Xcode" argument ONLY)
 #    SIMULATOR_WATCHOS = Build for x86_64 for watchOS Simulator.
 #    MAC_CATALYST = Build for macOS Catalyst
+#    OSX = Build for macOS
 #
 # CMAKE_OSX_SYSROOT: Path to the SDK to use.  By default this is
 #    automatically determined from PLATFORM and xcodebuild, but
@@ -96,6 +97,7 @@
 #    WATCHOS = armv7k arm64_32 (if applicable)
 #    SIMULATOR_WATCHOS = x86_64 (i386 has since long been deprecated)
 #    MAC_CATALYST = x86_64
+#    OSX = x86_64
 #
 # This toolchain defines the following variables for use externally:
 #
@@ -209,6 +211,8 @@ if(NOT DEFINED PLATFORM)
       set(PLATFORM "WATCHOS")
     elseif(CMAKE_OSX_ARCHITECTURES MATCHES "i386" AND CMAKE_OSX_SYSROOT MATCHES ".*watchsimulator.*")
       set(PLATFORM "SIMULATOR_WATCHOS")
+    elseif(CMAKE_OSX_ARCHITECTURES MATCHES "x86_64" AND CMAKE_OSX_SYSROOT MATCHES ".*macosx.*")
+      set(PLATFORM "OSX")
     endif()
   endif()
   if (NOT PLATFORM)
@@ -331,6 +335,11 @@ elseif(PLATFORM_INT STREQUAL "SIMULATOR_WATCHOS")
     set(APPLE_TARGET_TRIPLE_INT i386-apple-watchos)
   endif()
 elseif(PLATFORM_INT STREQUAL "MAC_CATALYST")
+  set(SDK_NAME macosx)
+  if(NOT ARCHS)
+    set(ARCHS x86_64)
+  endif()
+elseif(PLATFORM_INT STREQUAL "OSX")
   set(SDK_NAME macosx)
   if(NOT ARCHS)
     set(ARCHS x86_64)
