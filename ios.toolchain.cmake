@@ -58,14 +58,17 @@
 #    OS64COMBINED = Build for arm64 x86_64 iphoneOS. Combined into FAT STATIC lib (supported on 3.14+ of CMakewith "-G Xcode" argument ONLY)
 #    SIMULATOR = Build for x86 i386 iphoneOS Simulator.
 #    SIMULATOR64 = Build for x86_64 iphoneOS Simulator.
+#    SIMULATOR_ARM64 = Build for x86_64 iphoneOS Simulator.
 #    TVOS = Build for arm64 tvOS.
 #    TVOSCOMBINED = Build for arm64 x86_64 tvOS. Combined into FAT STATIC lib (supported on 3.14+ of CMake with "-G Xcode" argument ONLY)
 #    SIMULATOR_TVOS = Build for x86_64 tvOS Simulator.
 #    WATCHOS = Build for armv7k arm64_32 for watchOS.
 #    WATCHOSCOMBINED = Build for armv7k arm64_32 x86_64 watchOS. Combined into FAT STATIC lib (supported on 3.14+ of CMake with "-G Xcode" argument ONLY)
 #    SIMULATOR_WATCHOS = Build for x86_64 for watchOS Simulator.
-#    MAC_CATALYST = Build for macOS Catalyst
-#    OSX = Build for macOS
+#    MAC_CATALYST = Build for macOS Catalyst x86_64
+#    MAC_CATALYST64 = Build for macOS Catalyst arm64
+#    OSX = Build for macOS x86_64
+#    OSX64 = Build for macOS arm64
 #
 # CMAKE_OSX_SYSROOT: Path to the SDK to use.  By default this is
 #    automatically determined from PLATFORM and xcodebuild, but
@@ -92,12 +95,15 @@
 #    OS64 = arm64 (if applicable)
 #    SIMULATOR = i386
 #    SIMULATOR64 = x86_64
+#    SIMULATOR_ARM64 = arm64
 #    TVOS = arm64
 #    SIMULATOR_TVOS = x86_64 (i386 has since long been deprecated)
 #    WATCHOS = armv7k arm64_32 (if applicable)
 #    SIMULATOR_WATCHOS = x86_64 (i386 has since long been deprecated)
 #    MAC_CATALYST = x86_64
+#    MAC_CATALYST64 = arm64
 #    OSX = x86_64
+#    OSX64 = arm64
 #
 # This toolchain defines the following variables for use externally:
 #
@@ -213,6 +219,8 @@ if(NOT DEFINED PLATFORM)
       set(PLATFORM "SIMULATOR_WATCHOS")
     elseif(CMAKE_OSX_ARCHITECTURES MATCHES "x86_64" AND CMAKE_OSX_SYSROOT MATCHES ".*macosx.*")
       set(PLATFORM "OSX")
+    elseif(CMAKE_OSX_ARCHITECTURES MATCHES "arm64" AND CMAKE_OSX_SYSROOT MATCHES ".*macosx.*")
+      set(PLATFORM "OSX64")
     endif()
   endif()
   if (NOT PLATFORM)
@@ -280,6 +288,12 @@ elseif(PLATFORM_INT STREQUAL "SIMULATOR64")
     set(ARCHS x86_64)
     set(APPLE_TARGET_TRIPLE_INT x86_64-apple-ios)
   endif()
+elseif(PLATFORM_INT STREQUAL "SIMULATOR_ARM64")
+  set(SDK_NAME iphonesimulator)
+  if(NOT ARCHS)
+    set(ARCHS arm64)
+    set(APPLE_TARGET_TRIPLE_INT aarch64-apple-ios)
+  endif()
 elseif(PLATFORM_INT STREQUAL "TVOS")
   set(SDK_NAME appletvos)
   if(NOT ARCHS)
@@ -338,11 +352,25 @@ elseif(PLATFORM_INT STREQUAL "MAC_CATALYST")
   set(SDK_NAME macosx)
   if(NOT ARCHS)
     set(ARCHS x86_64)
+    set(APPLE_TARGET_TRIPLE_INT x86_64-apple-macosx)
+  endif()
+elseif(PLATFORM_INT STREQUAL "MAC_CATALYST64")
+  set(SDK_NAME macosx)
+  if(NOT ARCHS)
+    set(ARCHS arm64)
+    set(APPLE_TARGET_TRIPLE_INT aarch64-apple-macosx)
   endif()
 elseif(PLATFORM_INT STREQUAL "OSX")
   set(SDK_NAME macosx)
   if(NOT ARCHS)
     set(ARCHS x86_64)
+    set(APPLE_TARGET_TRIPLE_INT x86_64-apple-macosx)
+  endif()
+elseif(PLATFORM_INT STREQUAL "OSX64")
+  set(SDK_NAME macosx)
+  if(NOT ARCHS)
+    set(ARCHS arm64)
+    set(APPLE_TARGET_TRIPLE_INT aarch64-apple-macosx)
   endif()
 else()
   message(FATAL_ERROR "Invalid PLATFORM: ${PLATFORM_INT}")
